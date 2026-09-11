@@ -1,0 +1,20 @@
+// Stable UI copy. User reports and geographic names remain in their original language.
+const hindi: Record<string, string> = {
+  'OPERATIONS COMMAND':'संचालन केंद्र','DEMO MODE':'डेमो मोड','Deterministic risk engine':'नियम-आधारित जोखिम विश्लेषण','Simulated GPS & weather':'अनुकरणित GPS और मौसम',
+  'Regional logistics,':'क्षेत्रीय परिवहन,','in focus.':'एक नज़र में।','A single operational picture for corridors, field disruption and essential supply movement.':'मार्गों, घटनाओं और आवश्यक आपूर्ति की एकीकृत जानकारी।',
+  'OPEN LIVE MAP':'मानचित्र खोलें','REGIONAL ACCESSIBILITY':'क्षेत्रीय पहुँच','COMMAND PRIORITY':'प्राथमिक कार्रवाई','Monitored routes':'निगरानी वाले मार्ग','Restricted routes':'प्रतिबंधित मार्ग','Blocked corridors':'बंद मार्ग','Critical risk':'गंभीर जोखिम','Active incidents':'सक्रिय घटनाएँ','Vehicles in transit':'रास्ते में वाहन',
+  'Corridor health map':'मार्ग स्थिति मानचित्र','Priority events':'प्राथमिक घटनाएँ','VIEW ALL ALERTS':'सभी अलर्ट देखें','Operational route health':'मार्ग संचालन स्थिति','COMPARE ROUTES':'मार्गों की तुलना','OPEN RESPONSE MODE':'आपात संचालन खोलें',
+  'Live operational map':'संचालन मानचित्र','MAP LAYERS':'मानचित्र परतें','Routes':'मार्ग','Incidents':'घटनाएँ','Vehicles':'वाहन','Supply points':'आपूर्ति केंद्र','Risk focus':'जोखिम फ़िल्टर','All corridors':'सभी मार्ग','corridors visible':'दिख रहे मार्ग','Corridor layers':'मार्ग परतें','Route inspection':'मार्ग निरीक्षण','No corridors match this risk focus.':'इस जोखिम स्तर का कोई मार्ग नहीं मिला।',
+  'CORRIDOR ASSESSMENT':'मार्ग मूल्यांकन','Accessibility':'पहुँच','Risk score':'जोखिम अंक','Predicted delay':'अनुमानित देरी','Why this assessment?':'इस मूल्यांकन का कारण','Recommended action:':'सुझाई गई कार्रवाई:',
+  'FIELD OFFICER WORKFLOW':'क्षेत्रीय अधिकारी रिपोर्ट','Report an incident':'घटना की रिपोर्ट करें','Offline simulation':'ऑफ़लाइन अनुकरण','Incident type':'घटना का प्रकार','Severity':'गंभीरता','Readable location':'स्थान का नाम','Latitude':'अक्षांश','Longitude':'देशांतर','Situation description':'स्थिति का विवरण','Village, district, nearest landmark':'गाँव, जिला, नज़दीकी पहचान','What is blocked, damaged, or unsafe?':'क्या बंद, क्षतिग्रस्त या असुरक्षित है?','CAPTURE GPS':'GPS स्थान लें',
+  'Plan a resilient delivery':'सुरक्षित आपूर्ति की योजना','Origin':'प्रस्थान','Destination':'गंतव्य','Commodity':'सामग्री','Priority':'प्राथमिकता','Medicine':'दवाइयाँ','Food':'खाद्य सामग्री','Agricultural produce':'कृषि उपज','Emergency':'आपातकाल','High':'उच्च','Normal':'सामान्य','RECOMMENDED ROUTE':'सुझाया गया मार्ग','SAFER ALTERNATE':'वैकल्पिक मार्ग','Confidence':'विश्वास स्तर','Why this route?':'यह मार्ग क्यों?','INSPECT ON MAP':'मानचित्र पर देखें',
+  'Vehicle tracking':'वाहन निगरानी','Vehicle':'वाहन','Cargo / destination':'सामग्री / गंतव्य','Status':'स्थिति','Risk':'जोखिम','Incident command log':'घटना रजिस्टर','Type':'प्रकार','Location':'स्थान','Reporter':'रिपोर्टकर्ता','Time':'समय','Operational alerts':'संचालन अलर्ट','ACKNOWLEDGE':'स्वीकार करें','RESOLVE':'हल किया','Accessibility by district':'जिलेवार पहुँच','local incidents':'स्थानीय घटनाएँ',
+  'Response priorities':'प्रतिक्रिया प्राथमिकताएँ','Affected districts':'प्रभावित जिले','Critical incidents':'गंभीर घटनाएँ','Medicine vehicles':'दवा वाहन','Safe emergency routes':'सुरक्षित आपात मार्ग','Settings & integrations':'सेटिंग्स और सेवाएँ','Language':'भाषा','Data sources':'डेटा स्रोत','Pending provider approvals':'लंबित सेवा अनुमोदन',
+  'All systems monitoring':'निगरानी चालू','Priority response view':'प्राथमिक प्रतिक्रिया','ONLINE':'ऑनलाइन','SYSTEM STATUS':'सिस्टम स्थिति','EMERGENCY OPERATIONS ACTIVE':'आपात संचालन सक्रिय',
+  'LANDSLIDE':'भूस्खलन','FLOOD':'बाढ़','ROAD DAMAGE':'सड़क क्षति','BRIDGE DAMAGE':'पुल क्षति','TRAFFIC':'यातायात','SEVERE WEATHER':'खराब मौसम','OTHER':'अन्य','LOW':'कम','MEDIUM':'मध्यम','MODERATE':'मध्यम','HIGH':'उच्च','CRITICAL':'गंभीर',
+}
+export function translate(text: string): string {
+  if (localStorage.getItem('ner-language') !== 'hi') return text
+  const trimmed = text.trim()
+  return hindi[trimmed] ? text.replace(trimmed, hindi[trimmed]) : text
+}
