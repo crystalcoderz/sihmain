@@ -88,8 +88,8 @@ function App({ initial }: { initial: InitialState }) {
   return <div className={emergency ? 'app emergency-active' : 'app'}><aside className="sidebar"><div className="brand"><div className="brand-mark">{translate("N")}</div><div><strong>{translate("NER SENTINEL")}</strong><span>{translate("OPERATIONS COMMAND")}</span></div></div><nav>{nav.map((item) => <button key={item.id} onClick={() => setPage(item.id)} className={page === item.id ? 'active' : ''}><span className="nav-dot" />{t[item.key]}</button>)}</nav><div className="sidebar-footer"><span className="demo-label">{translate("DEMO MODE")}</span><p>{translate("Deterministic risk engine")}<br />{translate("Simulated GPS & weather")}</p></div></aside><main className={page === 'dashboard' ? 'main-light' : ''}>{page !== 'dashboard' && <header className="topbar"><div><span className="eyebrow">{translate("NORTH EASTERN REGION · ")}{emergency ? 'EMERGENCY OPERATIONS ACTIVE' : 'SYSTEM STATUS'}</span><strong>{emergency ? 'Priority response view' : 'All systems monitoring'}</strong></div><div className="top-actions"><span className={`network ${simulatedOffline ? 'offline' : 'online'}`}>{simulatedOffline ? `${pending} OFFLINE QUEUED` : 'ONLINE'}</span><button className="language" onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}>{language === 'en' ? 'हि' : 'EN'}</button><span className="clock">{translate("11 SEP 2026 · 14:32 IST")}</span></div></header>}{content()}</main></div>
 }
 
-function StatCard({ tone, icon, value, label, delta, trend }: { tone: string; icon: React.ReactNode; value: React.ReactNode; label: string; delta: string; trend: 'up' | 'down' }) {
-  return <div className="logi-stat"><span className={`logi-stat-ico tone-${tone}`}>{icon}</span><div className="logi-stat-body"><strong>{value}</strong><span className="logi-stat-label">{label}</span><span className={`logi-stat-delta ${trend}`}>{trend === 'up' ? '▲' : '▼'} {delta}</span></div></div>
+function StatCard({ icon, value, label, delta, trend, accent }: { icon: React.ReactNode; value: React.ReactNode; label: string; delta: string; trend: 'up' | 'down'; accent?: boolean }) {
+  return <div className={accent ? 'logi-stat logi-stat-accent' : 'logi-stat'}><div className="logi-stat-top"><span className="logi-stat-ico">{icon}</span><span className={`logi-stat-delta ${trend}`}>{trend === 'up' ? '↑' : '↓'} {delta}</span></div><strong>{value}</strong><span className="logi-stat-label">{label}</span></div>
 }
 
 const ICONS = {
@@ -98,6 +98,7 @@ const ICONS = {
   check: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M8 12.2l2.6 2.6L16.2 9" /></svg>,
   warn: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4.5l8.5 15h-17z" /><path d="M12 10v4" /><path d="M12 17h.01" /></svg>,
   search: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>,
+  swap: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M7 7h12l-3.5-3.5" /><path d="M17 17H5l3.5 3.5" /></svg>,
 }
 
 function Dashboard({ routes, incidents, vehicles, alerts, metrics, weather, onMap, onRoute, onNavigate, language, offline, onAlertChange }: { routes: Route[]; incidents: Incident[]; vehicles: Vehicle[]; alerts: Alert[]; metrics: { accessible: number; restricted: number; blocked: number; critical: number }; weather: WeatherReading[]; onMap: () => void; onRoute: (id: string) => void; onNavigate: (page: Page) => void; language: Language; offline: boolean; onAlertChange: (id: string, status: AlertStatus) => void }) {
@@ -140,17 +141,17 @@ function Dashboard({ routes, incidents, vehicles, alerts, metrics, weather, onMa
       </header>
 
       <section className="logi-stats">
-        <StatCard tone="blue" icon={ICONS.truck} value={vehicles.length} label={translate('Active Shipments')} delta={`${inTransit} ${translate('in transit')}`} trend="up" />
-        <StatCard tone="sky" icon={ICONS.cloud} value={weatherAlertCount} label={translate('Weather Alerts')} delta={`${severeWeather.length} ${translate('severe')}`} trend="down" />
-        <StatCard tone="green" icon={ICONS.check} value={`${onTime}%`} label={translate('On-Time Delivery')} delta={translate('fleet on schedule')} trend="up" />
-        <StatCard tone="amber" icon={ICONS.warn} value={highRisk} label={translate('High-Risk Routes')} delta={`${metrics.blocked} ${translate('blocked')}`} trend={highRisk ? 'down' : 'up'} />
+        <StatCard icon={ICONS.truck} value={vehicles.length} label={translate('Active Shipments')} delta={`${inTransit} ${translate('in transit')}`} trend="up" />
+        <StatCard icon={ICONS.cloud} value={weatherAlertCount} label={translate('Weather Alerts')} delta={`${severeWeather.length} ${translate('severe')}`} trend="down" />
+        <StatCard icon={ICONS.check} value={`${onTime}%`} label={translate('On-Time Delivery')} delta={translate('fleet on schedule')} trend="up" accent />
+        <StatCard icon={ICONS.warn} value={highRisk} label={translate('High-Risk Routes')} delta={`${metrics.blocked} ${translate('blocked')}`} trend={highRisk ? 'down' : 'up'} />
       </section>
 
       <div className="logi-main">
         <section className="logi-map-card">
           <div className="logi-planner">
             <label className="logi-field"><span className="logi-pin" /><select value={origin} onChange={(e) => setOrigin(e.target.value)}>{origins.map((o) => <option key={o} value={o}>{o}</option>)}</select></label>
-            <button className="logi-swap" onClick={() => { const o = origin; setOrigin(destination); setDestination(o) }} aria-label={translate('Swap origin and destination')}>⇄</button>
+            <button className="logi-swap" onClick={() => { const o = origin; setOrigin(destination); setDestination(o) }} aria-label={translate('Swap origin and destination')}>{ICONS.swap}</button>
             <label className="logi-field"><span className="logi-pin dest" /><select value={destination} onChange={(e) => setDestination(e.target.value)}>{destinations.map((d) => <option key={d} value={d}>{d}</option>)}</select></label>
             <button className="logi-find" onClick={findBest}>{translate('Find Best Route')}</button>
           </div>
