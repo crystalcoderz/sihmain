@@ -125,60 +125,63 @@ main { background-color: #000; background-image: linear-gradient(#ffffff08 1px, 
 .weather-stats span { color: #7f7f7f; font: 8px 'DM Mono'; letter-spacing: .4px; text-transform: uppercase; }
 
 /* ===== Command deck (mission-control dashboard) ===== */
-.command-deck { display: flex; flex-direction: column; gap: 16px; }
-.deck-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
-.deck-head-title h1 { margin: 4px 0 0; font-size: 26px; letter-spacing: -.8px; color: #f4f4f4; }
-.deck-head-metrics { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.head-metric { min-width: 84px; padding: 8px 12px; border: 1px solid #232323; border-radius: 10px; background: #101010; }
-.head-metric span { display: block; color: #7f7f7f; font: 8px 'DM Mono'; letter-spacing: .5px; text-transform: uppercase; margin-bottom: 3px; }
-.head-metric strong { color: #ededed; font-size: 20px; letter-spacing: -.5px; }
-.head-metric strong small { font-size: 11px; color: #909090; margin-left: 1px; }
-.head-metric.red { border-color: #4a1d1d; background: #170d0d; }
-.head-metric.red strong { color: #f87171; }
+.command-deck { display: flex; flex-direction: column; gap: 28px; }
+.deck-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.deck-head-title h1 { margin: 6px 0 0; font-size: 30px; letter-spacing: -1px; color: #f4f4f4; }
+.deck-head-title p { margin: 8px 0 0; color: #8a8a8a; font-size: 13px; }
 
-.deck-grid { display: grid; grid-template-columns: 1fr minmax(300px, 360px); grid-template-rows: minmax(340px, 1fr) auto; grid-template-areas: "map side" "alerts voice"; gap: 16px; }
-.deck-map { grid-area: map; display: flex; flex-direction: column; border: 1px solid #1f1f1f; border-radius: 14px; background: #0c0c0c; overflow: hidden; }
-.deck-side { grid-area: side; display: flex; flex-direction: column; border: 1px solid #1f1f1f; border-radius: 14px; background: #0c0c0c; overflow: hidden; }
-.deck-alerts { grid-area: alerts; border: 1px solid #1f1f1f; border-radius: 14px; background: #0c0c0c; padding: 14px 16px; }
-.deck-voice { grid-area: voice; border: 1px solid #1f1f1f; border-radius: 14px; background: #0c0c0c; padding: 14px 16px; overflow: auto; }
+/* Info-first stat strip (not buttons) */
+.deck-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid #1c1c1c; border-bottom: 1px solid #1c1c1c; }
+.deck-stat { padding: 18px 22px; border-left: 1px solid #1c1c1c; }
+.deck-stat:first-child { border-left: none; padding-left: 2px; }
+.deck-stat span { display: block; color: #7f7f7f; font: 9px 'DM Mono'; letter-spacing: .6px; text-transform: uppercase; margin-bottom: 10px; }
+.deck-stat strong { color: #f0f0f0; font-size: 32px; font-weight: 500; letter-spacing: -1px; }
+.deck-stat strong small { font-size: 14px; color: #808080; margin-left: 2px; }
+.deck-stat strong.danger { color: #e0656c; }
 
-.deck-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 14px 16px 10px; }
-.deck-panel-head h2 { margin: 3px 0 0; font-size: 15px; color: #ededed; letter-spacing: -.3px; }
-.deck-map-stage { position: relative; flex: 1; min-height: 320px; margin: 0 14px 14px; border-radius: 10px; overflow: hidden; }
-.deck-map-stage .map, .deck-map-stage .map-frame, .deck-map-stage .map-fallback { height: 100%; min-height: 320px; border-radius: 10px; }
+/* Balanced split (map | feed), and lower (alerts | voice) */
+.deck-split { display: grid; grid-template-columns: 1.4fr 1fr; gap: 28px; align-items: stretch; }
+.deck-split.lower { grid-template-columns: 1fr 1fr; }
+.deck-map, .deck-feed, .deck-alerts, .deck-voice { display: flex; flex-direction: column; min-width: 0; }
+.deck-map { min-height: 380px; }
+
+.deck-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.deck-panel-head h2 { margin: 4px 0 0; font-size: 16px; color: #ededed; letter-spacing: -.3px; font-weight: 500; }
+.deck-map-stage { position: relative; flex: 1; min-height: 340px; border: 1px solid #1f1f1f; border-radius: 12px; overflow: hidden; }
+.deck-map-stage .map, .deck-map-stage .map-frame, .deck-map-stage .map-fallback { height: 100%; min-height: 340px; }
 .deck-map-stage .map-canvas { height: 100%; }
 
-/* Tabs top-right */
-.deck-tabs { display: flex; gap: 4px; padding: 12px 12px 0; border-bottom: 1px solid #1a1a1a; }
-.deck-tabs button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 8px; border: none; background: transparent; color: #8a8a8a; font: 10px 'DM Mono'; letter-spacing: .4px; text-transform: uppercase; cursor: pointer; border-bottom: 2px solid transparent; transition: color .15s, border-color .15s; }
-.deck-tabs button span { padding: 1px 6px; border-radius: 999px; background: #1c1c1c; color: #b5b5b5; font-size: 9px; }
-.deck-tabs button:hover { color: #d4d4d4; }
-.deck-tabs button.active { color: #22c7a3; border-bottom-color: #22c7a3; }
-.deck-tabs button.active span { background: #10312a; color: #22c7a3; }
-.deck-tabpanel { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
-.deck-feed-row { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 9px 10px; border: 1px solid #1a1a1a; border-radius: 9px; background: #0f0f0f; color: inherit; cursor: pointer; transition: border-color .15s, background .15s; }
-.deck-feed-row:hover { border-color: #2e2e2e; background: #131313; }
+/* Minimal segmented control */
+.deck-segments { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid #1c1c1c; border-radius: 10px; background: #0b0b0b; margin-bottom: 14px; align-self: flex-start; }
+.deck-segments button { padding: 7px 16px; border: none; background: transparent; color: #8a8a8a; font: 10px 'DM Mono'; letter-spacing: .4px; text-transform: uppercase; cursor: pointer; border-radius: 7px; transition: color .15s, background .15s; }
+.deck-segments button:hover { color: #d4d4d4; }
+.deck-segments button.active { color: #0a0a0a; background: #22c7a3; }
+.deck-feed-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+.deck-feed-row { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; padding: 14px 4px; border: none; border-bottom: 1px solid #171717; background: transparent; color: inherit; cursor: pointer; transition: opacity .15s; }
+.deck-feed-row:last-child { border-bottom: none; }
+.deck-feed-row:hover { opacity: .68; }
 .deck-feed-row > div { flex: 1; min-width: 0; }
-.deck-feed-row strong { display: block; color: #ededed; font-size: 12px; letter-spacing: -.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.deck-feed-row span { display: block; color: #7f7f7f; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.deck-feed-row strong { display: block; color: #ededed; font-size: 13px; letter-spacing: -.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.deck-feed-row span { display: block; color: #7f7f7f; font-size: 11px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .deck-feed-row small { color: #909090; font: 9px 'DM Mono'; white-space: nowrap; }
 
-/* Alert system (bottom) */
-.deck-alert-row { display: flex; gap: 10px; overflow-x: auto; padding-top: 4px; }
-.deck-alert { display: flex; align-items: center; gap: 9px; min-width: 260px; padding: 10px 12px; border: 1px solid #1a1a1a; border-radius: 10px; background: #0f0f0f; }
+/* Alert system (calm list, not buttons) */
+.deck-alert-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.deck-alert { display: flex; align-items: center; gap: 14px; padding: 14px 4px; border-bottom: 1px solid #171717; }
+.deck-alert:last-child { border-bottom: none; }
 .deck-alert > div { flex: 1; min-width: 0; }
-.deck-alert strong { display: block; color: #ededed; font-size: 12px; letter-spacing: -.2px; }
-.deck-alert p { margin: 2px 0 0; color: #7f7f7f; font-size: 10px; }
-.deck-alert-all { display: flex; align-items: center; gap: 6px; white-space: nowrap; padding: 0 16px; border: 1px dashed #2a2a2a; border-radius: 10px; background: transparent; color: #22c7a3; font: 10px 'DM Mono'; letter-spacing: .5px; text-transform: uppercase; cursor: pointer; }
-.deck-alert-all:hover { border-color: #22c7a3; }
+.deck-alert strong { display: block; color: #ededed; font-size: 13px; letter-spacing: -.2px; }
+.deck-alert span { display: block; margin-top: 2px; color: #7f7f7f; font-size: 11px; }
 
 /* Voice mode */
 .deck-voice .voice-note { border: none; padding: 0; background: transparent; }
-.voice-log { margin-top: 12px; padding-top: 12px; border-top: 1px solid #1a1a1a; display: flex; flex-direction: column; gap: 6px; }
-.voice-log p { margin: 0; padding: 8px 10px; border-radius: 8px; background: #101010; border: 1px solid #1a1a1a; color: #c8c8c8; font-size: 11px; line-height: 1.5; }
+.voice-log { margin-top: 14px; padding-top: 14px; border-top: 1px solid #1a1a1a; display: flex; flex-direction: column; gap: 8px; }
+.voice-log p { margin: 0; padding: 10px 12px; border-radius: 8px; background: #0e0e0e; border: 1px solid #1a1a1a; color: #c8c8c8; font-size: 12px; line-height: 1.55; }
 
 @media (max-width: 1100px) { .chart-grid { grid-template-columns: 1fr; }.incident-layout, .inventory-layout { grid-template-columns: 1fr; }.timeline-card { position: static; }.incident-form { grid-template-columns: 1fr 1fr; }
-  .deck-grid { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; grid-template-areas: "map" "side" "alerts" "voice"; }
-  .deck-side { min-height: 320px; } }
+  .deck-split, .deck-split.lower { grid-template-columns: 1fr; gap: 24px; }
+  .deck-feed { min-height: 340px; } }
 @media (max-width: 760px) { .incident-form { grid-template-columns: 1fr; }.veh-grid { grid-template-columns: 1fr; }
-  .deck-head { align-items: flex-start; }.deck-head-metrics { width: 100%; } }
+  .deck-head { align-items: flex-start; }.deck-stats { grid-template-columns: 1fr 1fr; }
+  .deck-stat { border-left: none; border-top: 1px solid #1c1c1c; padding-left: 2px; }
+  .deck-stat:first-child, .deck-stat:nth-child(2) { border-top: none; } }

@@ -96,47 +96,48 @@ function Dashboard({ routes, incidents, vehicles, alerts, metrics, onMap, onRout
   const newAlerts = alerts.filter((a) => a.status === 'NEW')
   return (
     <div className="dashboard command-deck">
-      <section className="deck-head">
-        <div className="deck-head-title"><span className="eyebrow">{translate("NER SENTINEL · COMMAND OVERVIEW")}</span><h1>{translate("Regional command deck")}</h1></div>
-        <div className="deck-head-metrics">
-          <div className="head-metric"><span>{translate("ACCESSIBILITY")}</span><strong>{regionalAccess}<small>%</small></strong></div>
-          <div className="head-metric"><span>{translate("INCIDENTS")}</span><strong>{incidents.length}</strong></div>
-          <div className="head-metric"><span>{translate("IN TRANSIT")}</span><strong>{inTransit}</strong></div>
-          <div className="head-metric red"><span>{translate("BLOCKED")}</span><strong>{metrics.blocked}</strong></div>
-          <button className="button primary" onClick={onMap}><span className="pulse-dot" />{translate(" OPEN LIVE MAP")}</button>
-        </div>
-      </section>
-      <div className="deck-grid">
+      <header className="deck-head">
+        <div className="deck-head-title"><span className="eyebrow">{translate("NER SENTINEL · COMMAND OVERVIEW")}</span><h1>{translate("Regional command deck")}</h1><p>{translate("Live situational picture across the North Eastern Region")}</p></div>
+        <button className="button primary" onClick={onMap}><span className="pulse-dot" />{translate("Open live map")}</button>
+      </header>
+      <div className="deck-stats">
+        <div className="deck-stat"><span>{translate("Regional accessibility")}</span><strong>{regionalAccess}<small>%</small></strong></div>
+        <div className="deck-stat"><span>{translate("Active incidents")}</span><strong>{incidents.length}</strong></div>
+        <div className="deck-stat"><span>{translate("Vehicles in transit")}</span><strong>{inTransit}</strong></div>
+        <div className="deck-stat"><span>{translate("Blocked corridors")}</span><strong className={metrics.blocked ? 'danger' : ''}>{metrics.blocked}</strong></div>
+      </div>
+      <div className="deck-split">
         <section className="deck-map">
-          <div className="deck-panel-head"><div><span className="eyebrow">{translate("LIVE SURFACE · GEO-TAGGED")}</span><h2>{translate("Corridor & incident map")}</h2></div><button className="text-button" onClick={onMap}>{translate("EXPAND ↗")}</button></div>
+          <div className="deck-panel-head"><div><span className="eyebrow">{translate("LIVE SURFACE · GEO-TAGGED")}</span><h2>{translate("Corridor & incident map")}</h2></div><button className="text-button" onClick={onMap}>{translate("Expand ↗")}</button></div>
           <div className="deck-map-stage">
             <MapCanvas routes={routes} incidents={incidents} vehicles={vehicles} />
-            <div className="map-overlay"><span><i className="legend-line open" />{translate(" OPEN ")}{metrics.accessible}</span><span><i className="legend-line restricted" />{translate(" RESTRICTED ")}{metrics.restricted}</span><span><i className="legend-line blocked" />{translate(" BLOCKED ")}{metrics.blocked}</span></div>
-            <div className="map-stamp"><span className="pulse-dot" />{translate(" LIVE COMMAND LAYER")}</div>
+            <div className="map-overlay"><span><i className="legend-line open" />{translate(" Open ")}{metrics.accessible}</span><span><i className="legend-line restricted" />{translate(" Restricted ")}{metrics.restricted}</span><span><i className="legend-line blocked" />{translate(" Blocked ")}{metrics.blocked}</span></div>
           </div>
         </section>
-        <aside className="deck-side">
-          <div className="deck-tabs" role="tablist">
-            <button role="tab" className={tab === 'incidents' ? 'active' : ''} onClick={() => setTab('incidents')}>{translate("Incidents")}<span>{incidents.length}</span></button>
-            <button role="tab" className={tab === 'vehicles' ? 'active' : ''} onClick={() => setTab('vehicles')}>{translate("Fleet")}<span>{vehicles.length}</span></button>
-            <button role="tab" className={tab === 'corridors' ? 'active' : ''} onClick={() => setTab('corridors')}>{translate("Corridors")}<span>{routes.length}</span></button>
+        <aside className="deck-feed">
+          <div className="deck-segments" role="tablist">
+            <button role="tab" className={tab === 'incidents' ? 'active' : ''} onClick={() => setTab('incidents')}>{translate("Incidents")}</button>
+            <button role="tab" className={tab === 'vehicles' ? 'active' : ''} onClick={() => setTab('vehicles')}>{translate("Fleet")}</button>
+            <button role="tab" className={tab === 'corridors' ? 'active' : ''} onClick={() => setTab('corridors')}>{translate("Corridors")}</button>
           </div>
-          <div className="deck-tabpanel">
+          <div className="deck-feed-list">
             {tab === 'incidents' && incidents.map((i) => <button key={i.id} className="deck-feed-row" onClick={() => onNavigate('incidents')}><Badge value={i.severity} /><div><strong>{i.type}</strong><span>{i.location}</span></div><small>{fmtTime(i.createdAt)}</small></button>)}
             {tab === 'vehicles' && vehicles.map((v) => <button key={v.id} className="deck-feed-row" onClick={() => onNavigate('vehicles')}><Badge value={v.status} /><div><strong>{v.vehicleId}</strong><span>{v.commodity}</span></div><small>{Math.round(v.speed)}{translate(" kph")}</small></button>)}
             {tab === 'corridors' && routes.map((r) => { const risk = calculateRouteRisk(r, incidents); return <button key={r.id} className="deck-feed-row" onClick={() => { onRoute(r.id); onMap() }}><Badge value={risk.level} /><div><strong>{r.name}</strong><span>{r.origin}{translate(" → ")}{r.destination}</span></div><small>{r.accessibilityScore}{translate("%")}</small></button> })}
           </div>
         </aside>
+      </div>
+      <div className="deck-split lower">
         <section className="deck-alerts">
-          <div className="deck-panel-head"><div><span className="eyebrow">{translate("ALERT SYSTEM")}</span><h2>{translate("Priority events")}</h2></div><span className="count-chip">{newAlerts.length}{translate(" NEW")}</span></div>
-          <div className="deck-alert-row">
-            {alerts.slice(0, 6).map((alert) => <article className="deck-alert" key={alert.id}><Badge value={alert.severity} /><div><strong>{alert.title}</strong><p>{alert.location}{translate(" · ")}{alert.timestamp}</p></div>{alert.status === 'NEW' ? <button className="button ghost" onClick={() => onAlertChange(alert.id, 'ACKNOWLEDGED')}>{translate("ACK")}</button> : <Badge value={alert.status} />}</article>)}
-            <button className="deck-alert-all" onClick={() => onNavigate('alerts')}>{translate("VIEW ALL")}<span>{translate("→")}</span></button>
-          </div>
+          <div className="deck-panel-head"><div><span className="eyebrow">{translate("ALERT SYSTEM")}</span><h2>{translate("Priority events")}</h2></div><button className="text-button" onClick={() => onNavigate('alerts')}>{newAlerts.length}{translate(" new · View all →")}</button></div>
+          <ul className="deck-alert-list">
+            {alerts.slice(0, 4).map((alert) => <li className="deck-alert" key={alert.id}><Badge value={alert.severity} /><div><strong>{alert.title}</strong><span>{alert.location}{translate(" · ")}{alert.timestamp}</span></div>{alert.status === 'NEW' ? <button className="text-button" onClick={() => onAlertChange(alert.id, 'ACKNOWLEDGED')}>{translate("Ack")}</button> : <Badge value={alert.status} />}</li>)}
+          </ul>
         </section>
         <aside className="deck-voice">
+          <div className="deck-panel-head"><div><span className="eyebrow">{translate("AI VOICE MODE")}</span><h2>{translate("Field voice intake")}</h2></div></div>
           <VoiceNote language={language} offline={offline} onApply={(text) => setVoiceLog((log) => [text, ...log].slice(0, 4))} />
-          {voiceLog.length > 0 && <div className="voice-log"><span className="eyebrow">{translate("VOICE LOG")}</span>{voiceLog.map((entry, i) => <p key={i}>{entry}</p>)}</div>}
+          {voiceLog.length > 0 && <div className="voice-log">{voiceLog.map((entry, i) => <p key={i}>{entry}</p>)}</div>}
         </aside>
       </div>
     </div>
