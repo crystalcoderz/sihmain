@@ -1,7 +1,7 @@
 import { Loader } from '@googlemaps/js-api-loader'
 import type { Incident, Route, SupplyPoint, Vehicle } from '../domain/types'
 
-export interface MapProvider { render(element: HTMLElement, data: { routes: Route[]; incidents: Incident[]; vehicles: Vehicle[]; supplyPoints: SupplyPoint[] }): Promise<void>; destroy(): void }
+export interface MapProvider { render(element: HTMLElement, data: { routes: Route[]; incidents: Incident[]; vehicles: Vehicle[]; supplyPoints: SupplyPoint[]; theme?: 'dark' | 'light' }): Promise<void>; destroy(): void }
 const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character] ?? character))
 
 export class GoogleMapProvider implements MapProvider {
@@ -12,7 +12,7 @@ export class GoogleMapProvider implements MapProvider {
     if (!key) throw new Error('Google Maps is not configured. Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in Project Settings and reload.')
     const google = await new Loader({ apiKey: key, version: 'weekly' }).load()
     this.destroy()
-    this.map = new google.maps.Map(element, { center: { lat: 25.8, lng: 92.7 }, zoom: 6, mapTypeId: 'roadmap', disableDefaultUI: true, zoomControl: true, styles: [
+    const darkStyles = [
       { elementType: 'geometry', stylers: [{ color: '#171717' }] },
       { elementType: 'labels.text.fill', stylers: [{ color: '#8d8d8d' }] },
       { elementType: 'labels.text.stroke', stylers: [{ color: '#171717' }] },
@@ -26,7 +26,15 @@ export class GoogleMapProvider implements MapProvider {
       { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#242424' }] },
       { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#080808' }] },
       { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#4f4f4f' }] },
-    ] })
+    ]
+    const lightStyles = [
+      { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+      { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+      { featureType: 'road', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+      { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#eef1f4' }] },
+      { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#cfe3ef' }] },
+    ]
+    this.map = new google.maps.Map(element, { center: { lat: 25.8, lng: 92.7 }, zoom: 6, mapTypeId: 'roadmap', disableDefaultUI: true, zoomControl: true, styles: data.theme === 'light' ? lightStyles : darkStyles })
     const info = new google.maps.InfoWindow()
     data.routes.forEach((route) => {
       const color = route.status === 'BLOCKED' ? '#e14a4a' : route.status === 'RESTRICTED' ? '#e9a234' : '#24a780'
