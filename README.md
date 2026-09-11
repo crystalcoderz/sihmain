@@ -1,4 +1,4 @@
-# NER Sentinel
+# Jan Report
 
 AI-powered logistics and accessibility intelligence prototype for SIH26002 / MDoNER.
 
