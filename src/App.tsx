@@ -8,7 +8,6 @@ import type { Alert, AlertStatus, FieldReportDraft, Incident, IncidentEvent, Inc
 import { strings, type Language } from './i18n'
 import { GoogleMapProvider } from './services/google-map-provider'
 import { VoiceNote } from './components/VoiceNote'
-import { LanguageWelcome } from './components/LanguageWelcome'
 import { offlineQueue } from './services/offline-queue'
 import { Analytics } from './features/Analytics'
 import { Inventory } from './features/Inventory'
@@ -54,11 +53,10 @@ export interface InitialState { routes: Route[]; incidents: Incident[]; vehicles
 function App({ initial }: { initial: InitialState }) {
   const [page, setPage] = useState<Page>('dashboard'); const [routes, setRoutes] = useState(initial.routes); const [incidents, setIncidents] = useState(initial.incidents); const [alerts, setAlerts] = useState(initial.alerts); const [vehicles, setVehicles] = useState(initial.vehicles); const [simulatedOffline, setSimulatedOffline] = useState(false); const [pending, setPending] = useState(0); const [selectedRouteId, setSelectedRouteId] = useState('r1'); const [language, updateLanguage] = useState<Language>('en'); const [emergency, setEmergency] = useState(false); const restoreConnectionRef = useRef<() => Promise<void>>(async () => undefined)
   const [weather, setWeather] = useState(initial.weather); const [inventory, setInventory] = useState(initial.inventory); const [incidentEvents, setIncidentEvents] = useState(initial.incidentEvents)
-  const [needsLanguage, setNeedsLanguage] = useState(true)
   const refresh = async () => { try { const res = await fetch('/api/state', { cache: 'no-store' }); if (!res.ok) return; const data = await res.json(); setRoutes(data.routes); setIncidents(data.incidents); setVehicles(data.vehicles); setAlerts(data.alerts); setWeather(data.weather); setInventory(data.inventory); setIncidentEvents(data.incidentEvents) } catch { /* offline — keep current state */ } }
-  const setLanguage = (next: Language) => { localStorage.setItem('ner-language', next); updateLanguage(next); setNeedsLanguage(false); document.documentElement.lang = next }
+  const setLanguage = (next: Language) => { localStorage.setItem('ner-language', next); updateLanguage(next); document.documentElement.lang = next }
   useEffect(() => { document.documentElement.lang = language }, [language])
-  useEffect(() => { const stored = localStorage.getItem('ner-language'); if (stored === 'en' || stored === 'hi') { updateLanguage(stored); setNeedsLanguage(false) } else { setNeedsLanguage(true) } }, [])
+  useEffect(() => { const stored = localStorage.getItem('ner-language'); if (stored === 'en' || stored === 'hi') updateLanguage(stored) }, [])
   const t = strings(language)
   const metrics = useMemo(() => ({ accessible: routes.filter((route) => route.status === 'OPEN').length, restricted: routes.filter((route) => route.status === 'RESTRICTED').length, blocked: routes.filter((route) => route.status === 'BLOCKED').length, critical: routes.filter((route) => calculateRouteRisk(route, incidents).level === 'CRITICAL').length }), [routes, incidents])
   useEffect(() => { offlineQueue.pendingCount().then(setPending).catch(() => undefined) }, [])
@@ -84,7 +82,6 @@ function App({ initial }: { initial: InitialState }) {
     if (page === 'settings') return <Settings language={language} setLanguage={setLanguage} />
     return <Dashboard routes={routes} incidents={incidents} vehicles={vehicles} alerts={alerts} metrics={metrics} weather={weather} onMap={() => setPage('map')} onRoute={setSelectedRouteId} onNavigate={setPage} language={language} offline={simulatedOffline} onAlertChange={changeAlert} />
   }
-  if (needsLanguage) return <LanguageWelcome onChoose={setLanguage} />
   return <div className={emergency ? 'app emergency-active' : 'app'}><aside className="sidebar"><div className="brand"><div className="brand-mark">{translate("N")}</div><div><strong>{translate("NER SENTINEL")}</strong><span>{translate("OPERATIONS COMMAND")}</span></div></div><nav>{nav.map((item) => <button key={item.id} onClick={() => setPage(item.id)} className={page === item.id ? 'active' : ''}><span className="nav-dot" />{t[item.key]}</button>)}</nav><div className="sidebar-footer"><span className="demo-label">{translate("DEMO MODE")}</span><p>{translate("Deterministic risk engine")}<br />{translate("Simulated GPS & weather")}</p></div></aside><main className={page === 'dashboard' ? 'main-light' : ''}>{page !== 'dashboard' && <header className="topbar"><div><span className="eyebrow">{translate("NORTH EASTERN REGION · ")}{emergency ? 'EMERGENCY OPERATIONS ACTIVE' : 'SYSTEM STATUS'}</span><strong>{emergency ? 'Priority response view' : 'All systems monitoring'}</strong></div><div className="top-actions"><span className={`network ${simulatedOffline ? 'offline' : 'online'}`}>{simulatedOffline ? `${pending} OFFLINE QUEUED` : 'ONLINE'}</span><button className="language" onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}>{language === 'en' ? 'हि' : 'EN'}</button><span className="clock">{translate("11 SEP 2026 · 14:32 IST")}</span></div></header>}{content()}</main></div>
 }
 
