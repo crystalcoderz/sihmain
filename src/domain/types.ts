@@ -13,7 +13,13 @@ export interface Route {
   status: RouteStatus; accessibilityScore: number; riskScore: number; weatherRisk: number; floodRisk: number; landslideRisk: number; trafficRisk: number; roadConditionRisk: number; historicalIncidentRisk: number; path: Coordinates[]
 }
 export interface Incident { id: string; type: IncidentType; severity: IncidentSeverity; location: string; coordinates: Coordinates; description: string; reporter: string; createdAt: string; affectedRouteIds: string[]; syncStatus?: SyncStatus }
-export interface Vehicle { id: string; vehicleId: string; commodity: 'Medicines' | 'Food' | 'Agricultural produce' | 'Construction materials'; origin: string; destination: string; coordinates: Coordinates; speed: number; eta: string; status: VehicleStatus; riskLevel: RiskLevel; lastUpdated: string; deliveryPriority: 'NORMAL' | 'HIGH' | 'EMERGENCY' }
+export interface Vehicle { id: string; vehicleId: string; commodity: 'Medicines' | 'Food' | 'Agricultural produce' | 'Construction materials'; origin: string; destination: string; coordinates: Coordinates; speed: number; eta: string; status: VehicleStatus; riskLevel: RiskLevel; lastUpdated: string; deliveryPriority: 'NORMAL' | 'HIGH' | 'EMERGENCY'; assignedRouteId?: string }
+
+export type WeatherCondition = 'CLEAR' | 'RAIN' | 'HEAVY RAIN' | 'STORM' | 'FOG' | 'SNOW'
+export interface WeatherReading { id: string; districtId: string; condition: WeatherCondition; tempC: number; rainfallMm: number; windKph: number; riskContribution: number; updatedAt: string }
+export type InventoryCategory = 'Medicines' | 'Food' | 'Water' | 'Shelter' | 'Fuel'
+export interface InventoryItem { id: string; name: string; category: InventoryCategory; districtId: string; quantity: number; unit: string; threshold: number; updatedAt: string }
+export interface IncidentEvent { id: number; incidentId: string; event: string; createdAt: string }
 export interface SupplyPoint { id: string; name: string; districtId: string; commodity: string; status: 'AVAILABLE' | 'LOW' | 'CRITICAL'; coordinates: Coordinates }
 export interface Alert { id: string; title: string; description: string; severity: RiskLevel; location: string; timestamp: string; status: AlertStatus; relatedEntity: string }
 export interface FieldReportDraft { localReportId: string; incidentType: IncidentType; severity: IncidentSeverity; latitude: number; longitude: number; location: string; description: string; reporter: string; createdAt: string; syncStatus: SyncStatus; retryCount: number; lastSyncAttempt?: string; serverId?: string }

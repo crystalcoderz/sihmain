@@ -1,5 +1,5 @@
 import { Pool } from 'pg'
-import type { Alert, District, Incident, Route, SupplyPoint, Vehicle } from '@/src/domain/types'
+import type { Alert, District, Incident, IncidentEvent, InventoryItem, Route, SupplyPoint, Vehicle, WeatherReading } from '@/src/domain/types'
 
 const globalForPool = globalThis as unknown as { nerPool?: Pool }
 export const pool =
@@ -13,6 +13,9 @@ export interface ConsoleState {
   vehicles: Vehicle[]
   supplyPoints: SupplyPoint[]
   alerts: Alert[]
+  weather: WeatherReading[]
+  inventory: InventoryItem[]
+  incidentEvents: IncidentEvent[]
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -43,7 +46,24 @@ export const mapVehicle = (r: any): Vehicle => ({
   id: r.id, vehicleId: r.vehicle_id, commodity: r.commodity, origin: r.origin,
   destination: r.destination, coordinates: { lat: r.lat, lng: r.lng }, speed: r.speed,
   eta: r.eta, status: r.status, riskLevel: r.risk_level, lastUpdated: r.last_updated,
-  deliveryPriority: r.delivery_priority,
+  deliveryPriority: r.delivery_priority, assignedRouteId: r.assigned_route_id ?? undefined,
+})
+
+export const mapWeather = (r: any): WeatherReading => ({
+  id: r.id, districtId: r.district_id, condition: r.condition, tempC: Number(r.temp_c),
+  rainfallMm: Number(r.rainfall_mm), windKph: Number(r.wind_kph),
+  riskContribution: Number(r.risk_contribution), updatedAt: new Date(r.updated_at).toISOString(),
+})
+
+export const mapInventory = (r: any): InventoryItem => ({
+  id: r.id, name: r.name, category: r.category, districtId: r.district_id,
+  quantity: Number(r.quantity), unit: r.unit, threshold: Number(r.threshold),
+  updatedAt: new Date(r.updated_at).toISOString(),
+})
+
+export const mapIncidentEvent = (r: any): IncidentEvent => ({
+  id: Number(r.id), incidentId: r.incident_id, event: r.event,
+  createdAt: new Date(r.created_at).toISOString(),
 })
 
 export const mapSupplyPoint = (r: any): SupplyPoint => ({
@@ -58,13 +78,16 @@ export const mapAlert = (r: any): Alert => ({
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 export async function getState(): Promise<ConsoleState> {
-  const [districts, routes, incidents, vehicles, supplyPoints, alerts] = await Promise.all([
+  const [districts, routes, incidents, vehicles, supplyPoints, alerts, weather, inventory, incidentEvents] = await Promise.all([
     pool.query('SELECT * FROM districts ORDER BY name'),
     pool.query('SELECT * FROM routes ORDER BY id'),
     pool.query('SELECT * FROM incidents ORDER BY created_at DESC'),
     pool.query('SELECT * FROM vehicles ORDER BY id'),
     pool.query('SELECT * FROM supply_points ORDER BY id'),
     pool.query('SELECT * FROM alerts ORDER BY created_at DESC'),
+    pool.query('SELECT * FROM weather ORDER BY district_id'),
+    pool.query('SELECT * FROM inventory ORDER BY category, name'),
+    pool.query('SELECT * FROM incident_events ORDER BY created_at ASC'),
   ])
   return {
     districts: districts.rows.map(mapDistrict),
@@ -73,5 +96,8 @@ export async function getState(): Promise<ConsoleState> {
     vehicles: vehicles.rows.map(mapVehicle),
     supplyPoints: supplyPoints.rows.map(mapSupplyPoint),
     alerts: alerts.rows.map(mapAlert),
+    weather: weather.rows.map(mapWeather),
+    inventory: inventory.rows.map(mapInventory),
+    incidentEvents: incidentEvents.rows.map(mapIncidentEvent),
   }
 }
