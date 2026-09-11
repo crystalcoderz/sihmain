@@ -8,8 +8,8 @@ export class GoogleMapProvider implements MapProvider {
   private map?: google.maps.Map
   private overlays: google.maps.MVCObject[] = []
   async render(element: HTMLElement, data: { routes: Route[]; incidents: Incident[]; vehicles: Vehicle[]; supplyPoints: SupplyPoint[] }) {
-    const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined
-    if (!key) throw new Error('Google Maps is not configured. Add VITE_GOOGLE_MAPS_API_KEY to .env and restart the app.')
+    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    if (!key) throw new Error('Google Maps is not configured. Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in Project Settings and reload.')
     const google = await new Loader({ apiKey: key, version: 'weekly' }).load()
     this.destroy()
     this.map = new google.maps.Map(element, { center: { lat: 25.8, lng: 92.7 }, zoom: 6, mapTypeId: 'roadmap', disableDefaultUI: true, zoomControl: true, styles: [
